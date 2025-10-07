@@ -23,9 +23,14 @@ class MujocoReachEnv(gym.Env):
         continuous_action = self.action_map[action]
         self.arm_state = np.clip(self.arm_state + continuous_action * 0.05, -1, 1)
         dist = np.linalg.norm(self.arm_state - self.target)
-        reward = -dist
-        done = dist < 0.05
+        reward = -10 * dist   # scaled for stronger signal
+
+        done = dist < 0.02    # tighter success condition
+        if done:
+            reward += 10.0    # success bonus
+
         return np.concatenate([self.arm_state, self.target]), reward, done, False, {}
+
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
